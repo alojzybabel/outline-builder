@@ -34,7 +34,7 @@ public class MathUtilTest
                {p1, p2, 45},
                {p1, p3, 45},
                {p1, p4, 90},
-               {p5, p6, -45},
+               {p5, p6, -45}
            };
     }
 
@@ -56,5 +56,24 @@ public class MathUtilTest
        {
            {line, p3, 0}
        };
+    }
+
+    @Test( dataProvider = "getLengthData")
+    public void testLength(final Line line, long result)
+    {
+        assertThat(MathUtil.length(line)).isEqualTo(result);
+    }
+
+    @DataProvider
+    public Object [][] getLengthData()
+    {
+        final Point p1 = new Point(1,1);
+        final Point p2 = new Point(5,4);
+        final Line line = new Line(p1, p2);
+
+        return new Object[][]
+           {
+               {line, 5}
+          };
     }
 }

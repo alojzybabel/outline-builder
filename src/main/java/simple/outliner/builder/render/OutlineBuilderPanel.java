@@ -4,12 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
 
 import javax.swing.JPanel;
 
 import com.kadme.test.Line;
-import simple.outliner.builder.LineGenerator;
+import simple.outliner.builder.RandomLineGenerator;
 import simple.outliner.builder.math.LineGroup;
 import simple.outliner.builder.math.LineGroupContainer;
 
@@ -38,7 +37,7 @@ public class OutlineBuilderPanel extends JPanel
 
         Graphics2D g2d = (Graphics2D) g;
         final LineGroupContainer lineGroupContainer = new LineGroupContainer(4D, 0.2 * 2560);
-        new LineGenerator(2560, 1440, 100)
+        new RandomLineGenerator(2560, 1440, 100)
                         .generate()
                         .stream()
                         .forEach(lineGroupContainer::add);
@@ -76,6 +75,7 @@ public class OutlineBuilderPanel extends JPanel
                      line.getP1().getY(),
                      line.getP2().getX(),
                      line.getP2().getY());
+
 
     }
 }

@@ -11,6 +11,11 @@ public class PointAdapter
         this.point = point;
     }
 
+    public PointAdapter(final double x, final double y)
+    {
+        this.point = new Point(x,y);
+    }
+
     public int getX()
     {
         return Math.toIntExact(Math.round(point.getX()));

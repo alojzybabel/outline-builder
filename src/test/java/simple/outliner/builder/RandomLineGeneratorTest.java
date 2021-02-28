@@ -8,13 +8,13 @@ import org.testng.annotations.Test;
 
 import com.kadme.test.Line;
 
-public class LineGeneratorTest
+public class RandomLineGeneratorTest
 {
 
     @Test
     public void testGenerate()
     {
-        final LineGenerator generator = new LineGenerator(2048, 1536, 100);
+        final RandomLineGenerator generator = new RandomLineGenerator(2048, 1536, 100);
         final List<Line> line =  generator.generate();
 
         assertThat(line.size()).isEqualTo(100);

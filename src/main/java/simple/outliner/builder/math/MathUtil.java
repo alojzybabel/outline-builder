@@ -2,6 +2,8 @@ package simple.outliner.builder.math;
 
 import com.kadme.test.Line;
 import com.kadme.test.Point;
+import simple.outliner.builder.math.second.geom.Polygon2D;
+import simple.outliner.builder.math.second.geom.Segment;
 
 public final class MathUtil
 {
@@ -64,5 +66,29 @@ public final class MathUtil
         final double y0 = point.getY();
         final double distance = Math.abs(A*x0 + B*y0 + C) / Math.hypot(A, B);
         return distance;
+    }
+
+    /**
+     * Count the line length.
+     * @param line the line.
+     * @return the line length.
+     */
+    public static double length(final Line line)
+    {
+        final double deltaX = line.getP2().getX() - line.getP1().getX();
+        final double deltaY = line.getP2().getY() - line.getP1().getY();
+        return Math.hypot(deltaX, deltaY);
+    }
+
+    /**
+     *  Check if the line intersects the polygon.
+     * @param polygon the polygon.
+     * @param line the line.
+     * @return true if the line intersects the polgon.
+     */
+    public static boolean isTheLineIntersectingThePolygon(final Polygon2D polygon, final Line line)
+    {
+        final Segment segment = new Segment(line);
+        return polygon.getSegments().stream().filter(segment::intersects).findFirst().isPresent();
     }
 }
