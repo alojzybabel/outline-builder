@@ -24,7 +24,7 @@ public class Segment
                                       y1,
                                       x2,
                                       y2);
-        this.type = SegmentType.HARD;
+        this.type = type;
     }
 
     public Segment(final Line2D line, final SegmentType type)

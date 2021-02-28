@@ -2,7 +2,8 @@ package simple.outliner.builder.math.second.geom;
 
 import java.awt.geom.Path2D;
 import java.util.LinkedList;
-import java.util.List;
+
+import com.kadme.test.Point;
 
 /** Represents the polygon. */
 public class Polygon2D
@@ -22,6 +23,12 @@ public class Polygon2D
     public boolean contains(final double x, final double y)
     {
         return generatePath().contains(x, y);
+    }
+
+
+    public boolean contains(final Point point)
+    {
+        return contains(point.getX(), point.getY());
     }
 
     public Path2D generatePath()

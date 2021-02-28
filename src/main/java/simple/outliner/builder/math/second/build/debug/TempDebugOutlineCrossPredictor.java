@@ -1,6 +1,4 @@
-package simple.outliner.builder.math.second.build;
-
-import static simple.outliner.builder.math.MathUtil.isTheLineIntersectingThePolygon;
+package simple.outliner.builder.math.second.build.debug;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,40 +6,33 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.kadme.test.Line;
+import com.kadme.test.Point;
 import simple.outliner.builder.math.second.geom.Polygon2D;
 import simple.outliner.builder.math.second.geom.Segment;
 import simple.outliner.builder.math.second.geom.SegmentType;
 
-/** For test purpose. */
-public class TempDebugOutlineConnectionPredictor
+public class TempDebugOutlineCrossPredictor
 {
-
     public List<Segment> predictConnection(final Polygon2D polygon, final Line line)
     {
         if (isMyJob(polygon, line))
         {
+            final List<Segment> result = new ArrayList<>();
             List<Segment> reachableFromP1 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP1().getX(), line.getP1().getY());
-            List<Segment> reachableFromP2 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP2().getX(), line.getP2().getY());
-            final Segment p1 = reachableFromP1.get(0);
-            final Segment p2 = reachableFromP2.stream().filter( s -> s != p1).findFirst().get();
-            final int index1 = polygon.getSegments().indexOf(p1);
-            final int index2 = polygon.getSegments().indexOf(p2);
-            if (index1 < index2)
-            {
-                final Segment lineSegment = new Segment(line);
-                return mergeSegment(index1, index2, lineSegment, polygon);
-            }
-            else if (index1 > index2)
-            {
-                final Segment lineSegment = new Segment(line.getP2().getX(), line.getP2().getY(),
-                                                        line.getP1().getX(), line.getP1().getY(), SegmentType.HARD);
-                return mergeSegment(index2, index1, lineSegment, polygon);
-            }
-            else
-            {
-                throw new IllegalStateException("The ends of new segment cannot connect to the same point");
-            }
+            final Segment p11 = reachableFromP1.get(0);
+            final Segment p12 = reachableFromP1.get(1);
+            final int index1 = polygon.getSegments().indexOf(p11);
+            final int index2 = polygon.getSegments().indexOf(p12);
+            result.addAll(mergePoint(index1, index2, line.getP1(), polygon));
 
+
+            List<Segment> reachableFromP2 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP2().getX(), line.getP2().getY());
+            final Segment p21 = reachableFromP2.get(0);
+            final Segment p22 = reachableFromP2.get(1);
+            final int index3 = polygon.getSegments().indexOf(p21);
+            final int index4 = polygon.getSegments().indexOf(p22);
+            result.addAll(mergePoint(index3, index4, line.getP2(), polygon));
+            return result;
         }
         return new ArrayList<>();
     }
@@ -57,7 +48,7 @@ public class TempDebugOutlineConnectionPredictor
     {
         return !polygon.contains(line.getP1().getX(), line.getP1().getY())
                && !polygon.contains(line.getP2().getX(), line.getP2().getY())
-               && !isTheLineIntersectingThePolygon(polygon, line);
+               && isTheLineIntersectingThePolygon(polygon, line);
     }
 
     /**
@@ -121,20 +112,35 @@ public class TempDebugOutlineConnectionPredictor
         return false;
     }
 
-
-    private List<Segment> mergeSegment(final int start, final int end, final Segment segment, final Polygon2D polygon)
+    private List<Segment> mergePoint(int start, int end, final Point point, final Polygon2D polygon)
     {
+        if (start == end)
+        {
+            throw new IllegalStateException("Start and end index in outline crossing merger can not be the same.");
+        }
+
         final LinkedList<Segment> segments = polygon.getSegments();
         final Segment first = polygon.getSegments().get(start);
         final Segment last = polygon.getSegments().get(end);
         //connection from first to p1 of segment
-        final Segment connection1 = new Segment(first.getX2(), first.getY2(), segment.getX1(), segment.getY1(), SegmentType.SOFT);
-        final Segment connection2 = new Segment(segment.getX2(), segment.getY2(), last.getX2(), last.getY2(), SegmentType.SOFT);
+        final Segment connection1 = new Segment(first.getX2(), first.getY2(), point.getX(), point.getY(), SegmentType.SOFT);
+        final Segment connection2 = new Segment(point.getX(), point.getY(), last.getX2(), last.getY2(), SegmentType.SOFT);
 
-        final List<Segment> list = new ArrayList<>(2);
-        list.add(connection1);
-        list.add(connection2);
-        return list;
+        final List<Segment> connections = new ArrayList<>(2);
+        connections.add(connection1);
+        connections.add(connection2);
+        return connections;
     }
 
+    /**
+     *  Check if the line intersects the polygon.
+     * @param polygon the polygon.
+     * @param line the line.
+     * @return true if the line intersects the polgon.
+     */
+    protected static boolean isTheLineIntersectingThePolygon(final Polygon2D polygon, final Line line)
+    {
+        final Segment segment = new Segment(line);
+        return polygon.getSegments().stream().filter(segment::intersects).findFirst().isPresent();
+    }
 }

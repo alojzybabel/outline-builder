@@ -79,16 +79,4 @@ public final class MathUtil
         final double deltaY = line.getP2().getY() - line.getP1().getY();
         return Math.hypot(deltaX, deltaY);
     }
-
-    /**
-     *  Check if the line intersects the polygon.
-     * @param polygon the polygon.
-     * @param line the line.
-     * @return true if the line intersects the polgon.
-     */
-    public static boolean isTheLineIntersectingThePolygon(final Polygon2D polygon, final Line line)
-    {
-        final Segment segment = new Segment(line);
-        return polygon.getSegments().stream().filter(segment::intersects).findFirst().isPresent();
-    }
 }

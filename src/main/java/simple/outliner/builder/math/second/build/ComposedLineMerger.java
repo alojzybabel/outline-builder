@@ -12,8 +12,8 @@ public class ComposedLineMerger implements LineMerger
                     {
                         new OutlineLineMerger(),
                         new OutlineCrossingLineMerger(),
-                        new InlineLineMerger(),
-                        new InOutLineMerger()
+                        new InOutLineMerger(),
+                        new InlineLineMerger()
                     };
 
     @Override

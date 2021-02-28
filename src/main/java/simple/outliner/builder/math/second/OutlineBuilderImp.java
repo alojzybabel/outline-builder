@@ -7,13 +7,12 @@ import java.util.stream.Collectors;
 import com.kadme.test.Line;
 import simple.outliner.builder.LineGenerator;
 import simple.outliner.builder.math.second.build.LineMerger;
-import simple.outliner.builder.math.second.build.TempDebugOutlineConnectionPredictor;
 import simple.outliner.builder.math.second.geom.Polygon2D;
 import simple.outliner.builder.math.second.geom.Segment;
 import simple.outliner.builder.math.second.geom.SegmentType;
 import simple.outliner.builder.render.LineAdapter;
 
-public class OutlinerBuilder
+public class OutlineBuilderImp 
 {
     /** Stores all generated lines. */
     private final List<Line> allLines;
@@ -28,7 +27,7 @@ public class OutlinerBuilder
 
     private Polygon2D polygon = null;
 
-    public OutlinerBuilder(final LineGenerator generator, final LineMerger merger)
+    public OutlineBuilderImp(final LineGenerator generator, final LineMerger merger)
     {
         this.generator = generator;
         this.merger = merger;
@@ -123,12 +122,5 @@ public class OutlinerBuilder
         usedLines.add(line);
         //all line should be merged, return false if merger does not merge the line.
         return merger.merge(polygon, line);
-    }
-
-    public List<Segment> getTempConnections()
-    {
-        //TODO Remove
-        final TempDebugOutlineConnectionPredictor merger = new TempDebugOutlineConnectionPredictor();
-        return merger.predictConnection(polygon, notUsedLines.get(0));
     }
 }

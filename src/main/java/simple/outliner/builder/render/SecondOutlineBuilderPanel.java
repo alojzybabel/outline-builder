@@ -10,24 +10,22 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 
-import com.kadme.test.Line;
-import com.kadme.test.Point;
 import simple.outliner.builder.LineGenerator;
 import simple.outliner.builder.RandomLineGenerator;
-import simple.outliner.builder.math.second.OutlinerBuilder;
+import simple.outliner.builder.math.second.OutlineBuilderImp;
 import simple.outliner.builder.math.second.build.ComposedLineMerger;
 
 public class SecondOutlineBuilderPanel extends JPanel implements ActionListener
 {
 
-    private final OutlinerBuilder builder;
+    private final OutlineBuilderImp builder;
 
     public SecondOutlineBuilderPanel()
     {
         super(new BorderLayout());
         //final LineGenerator generator =  new RandomLineGenerator(2560, 1440, 100);
         final LineGenerator generator =  new RandomLineGenerator(800, 600, 100);
-        builder = new OutlinerBuilder(generator, new ComposedLineMerger());
+        builder = new OutlineBuilderImp(generator, new ComposedLineMerger());
     }
 
     private void doDrawing(Graphics g) {
@@ -43,14 +41,6 @@ public class SecondOutlineBuilderPanel extends JPanel implements ActionListener
             drawLine(l, Color.BLACK, g2d);
         });
 
-        builder.getTempConnections()
-               .stream()
-               .map(s -> new Line(new Point(s.getX1(), s.getY1()), new Point(s.getX2(), s.getY2())))
-               .map(LineAdapter::new)
-               .forEach( l ->
-                 {
-                    drawLine(l, Color.GREEN, g2d);
-                });
     }
 
     @Override
