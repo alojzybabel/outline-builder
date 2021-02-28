@@ -25,7 +25,6 @@ public class Polygon2D
         return generatePath().contains(x, y);
     }
 
-
     public boolean contains(final Point point)
     {
         return contains(point.getX(), point.getY());
@@ -35,7 +34,8 @@ public class Polygon2D
     {
         Path2D path = new Path2D.Double();
         path.moveTo(segments.get(0).getX2(), segments.get(0).getY2());
-        for(int i = 1; i < segments.size(); ++i) {
+        for(int i = 1; i < segments.size(); i++)
+        {
             path.lineTo(segments.get(i).getX2(), segments.get(i).getY2());
         }
         path.closePath();

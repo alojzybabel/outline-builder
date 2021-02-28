@@ -10,15 +10,15 @@ import simple.outliner.builder.math.second.geom.Segment;
 import simple.outliner.builder.math.second.geom.SegmentType;
 
 /** Merge line if both line points are placed outside the polygon. */
-public class OutlineLineMerger extends AbstractOutlineParent implements LineMerger
+public class OutlineLineMerger extends AbstractMergerParent implements LineMerger
 {
     @Override
     public boolean merge(final Polygon2D polygon, final Line line)
     {
         if (isMyJob(polygon, line))
         {
-            List<Segment> reachableFromP1 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP1().getX(), line.getP1().getY());
-            List<Segment> reachableFromP2 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP2().getX(), line.getP2().getY());
+            List<Segment> reachableFromP1 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP1());
+            List<Segment> reachableFromP2 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP2());
             final Segment p1 = reachableFromP1.get(0);
             final Segment p2 = reachableFromP2.stream().filter( s -> s != p1).findFirst().get();
             final int index1 = polygon.getSegments().indexOf(p1);
@@ -63,8 +63,17 @@ public class OutlineLineMerger extends AbstractOutlineParent implements LineMerg
         final Segment first = polygon.getSegments().get(start);
         final Segment last = polygon.getSegments().get(end);
         //connection from first to p1 of segment
-        final Segment connection1 = new Segment(first.getX2(), first.getY2(), segment.getX1(), segment.getY1(), SegmentType.SOFT);
-        final Segment connection2 = new Segment(segment.getX2(), segment.getY2(), last.getX2(), last.getY2(), SegmentType.SOFT);
+        Segment connection1 = new Segment(first.getX2(), first.getY2(), segment.getX1(), segment.getY1(), SegmentType.SOFT);
+        Segment connection2 = new Segment(segment.getX2(), segment.getY2(), last.getX2(), last.getY2(), SegmentType.SOFT);
+
+        // Replace segment ends if connections intersect
+        Segment segmentToInsert = segment;
+        if (connection1.intersects(connection2))
+        {
+            segmentToInsert = new Segment(segment.getX2(), segment.getY2(), segment.getX1(), segment.getY1(), SegmentType.HARD);
+            connection1 = new Segment(first.getX2(), first.getY2(), segmentToInsert.getX1(), segmentToInsert.getY1(), SegmentType.SOFT);
+            connection2 = new Segment(segmentToInsert.getX2(), segmentToInsert.getY2(), last.getX2(), last.getY2(), SegmentType.SOFT);
+        }
 
         //Remove old segments
         final List<Segment> toRemove = new ArrayList<>(end-start);
@@ -76,7 +85,7 @@ public class OutlineLineMerger extends AbstractOutlineParent implements LineMerg
 
         //Add new segments
         segments.add(start+1, connection1);
-        segments.add(start+2, segment);
+        segments.add(start+2, segmentToInsert);
         segments.add(start+3, connection2);
     }
 }
