@@ -34,7 +34,7 @@ public class SecondOutlineBuilderPanel extends JPanel implements ActionListener
     public SecondOutlineBuilderPanel()
     {
         super(new BorderLayout());
-        generator = new RandomLineGenerator(1280, 600, 50);
+        generator = new RandomLineGenerator(1280, 600, 100);
         builder = new IterableOutlineBuilder(generator, new ComposedLineMerger());
     }
 
@@ -53,7 +53,7 @@ public class SecondOutlineBuilderPanel extends JPanel implements ActionListener
     private void drawIterable(final Graphics2D g)
     {
         final BasicStroke thin =  new BasicStroke(1.0f);
-        final BasicStroke thick =  new BasicStroke(2.0f);
+        final BasicStroke thick =  new BasicStroke(3.0f);
         final Graphics2D g2d = g;
         g2d.setColor(Color.RED);
         g2d.setStroke(thick);

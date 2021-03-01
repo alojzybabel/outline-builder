@@ -1,7 +1,5 @@
 package simple.outliner.builder.math.second.build;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.kadme.test.Line;
@@ -17,28 +15,7 @@ public class OutlineLineMerger extends AbstractMergerParent implements LineMerge
     {
         if (isMyJob(polygon, line))
         {
-            List<Segment> reachableFromP1 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP1());
-            List<Segment> reachableFromP2 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP2());
-            final Segment p1 = reachableFromP1.get(0);
-            final Segment p2 = reachableFromP2.stream().filter( s -> s != p1).findFirst().get();
-            final int index1 = polygon.getSegments().indexOf(p1);
-            final int index2 = polygon.getSegments().indexOf(p2);
-            if (index1 < index2)
-            {
-                final Segment lineSegment = new Segment(line);
-                mergeLine(index1, index2, lineSegment, polygon);
-            }
-            else if (index1 > index2)
-            {
-                final Segment lineSegment = new Segment(line.getP2().getX(), line.getP2().getY(),
-                                                        line.getP1().getX(), line.getP1().getY(), SegmentType.HARD);
-                mergeLine(index2, index1, lineSegment, polygon);
-            }
-            else
-            {
-                throw new IllegalStateException("The ends of new segment cannot connect to the same point");
-            }
-            return true;
+            return mergeLine(polygon, line);
         }
         return false;
     }
@@ -57,42 +34,67 @@ public class OutlineLineMerger extends AbstractMergerParent implements LineMerge
                && !isTheLineIntersectingThePolygon(polygon, line);
     }
 
-    /**
-     * Merge line to the polygon.
-     * @param start
-     * @param end
-     * @param segment
-     * @param polygon
-     */
-    private void mergeLine(final int start, final int end, final Segment segment, final Polygon2D polygon)
+
+    private boolean mergeLine(final Polygon2D polygon, final Line line)
     {
-        final LinkedList<Segment> segments = polygon.getSegments();
-        final Segment first = polygon.getSegments().get(start);
-        final Segment last = polygon.getSegments().get(end);
-        //connection from first to p1 of segment
-        Segment connection1 = new Segment(first.getX2(), first.getY2(), segment.getX1(), segment.getY1(), SegmentType.SOFT);
-        Segment connection2 = new Segment(segment.getX2(), segment.getY2(), last.getX2(), last.getY2(), SegmentType.SOFT);
-
-        // Replace segment ends if connections intersect
-        Segment segmentToInsert = segment;
-        if (connection1.intersects(connection2))
+        List<Segment> reachableFromP1 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP1());
+        List<Segment> reachableFromP2 =  filterReachableSegmentsSortedByDistance(polygon.getSegments(), line.getP2());
+        //Check if at least one point of the polygon is reachable from line
+        if (reachableFromP1.isEmpty() || reachableFromP2.isEmpty())
         {
-            segmentToInsert = new Segment(segment.getX2(), segment.getY2(), segment.getX1(), segment.getY1(), SegmentType.HARD);
-            connection1 = new Segment(first.getX2(), first.getY2(), segmentToInsert.getX1(), segmentToInsert.getY1(), SegmentType.SOFT);
-            connection2 = new Segment(segmentToInsert.getX2(), segmentToInsert.getY2(), last.getX2(), last.getY2(), SegmentType.SOFT);
+            return false;
         }
 
-        //Remove old segments
-        final List<Segment> toRemove = new ArrayList<>(end-start);
-        for (int i=end; i>start; i--)
-        {
-            toRemove.add(polygon.getSegments().get(i));
-        }
-        polygon.getSegments().removeAll(toRemove);
+        final Segment first = reachableFromP1.get(0);
+        final int indexFirst = polygon.getSegments().indexOf(first);
+        final int size = polygon.getSegments().size();
+        final Segment right = polygon.getSegments().get((indexFirst + 1) % size);
 
-        //Add new segments
-        segments.add(start+1, connection1);
-        segments.add(start+2, segmentToInsert);
-        segments.add(start+3, connection2);
+        boolean merged = false;
+        if (reachableFromP2.contains(right))
+        {
+            final Segment connection = new Segment(first.getX2(), first.getY2(), line.getP1().getX(), line.getP1().getY(), SegmentType.SOFT);
+            final Segment rightConnection = new Segment(line.getP2().getX(), line.getP2().getY(), right.getX2(), right.getY2(), SegmentType.SOFT);
+            if(!connection.intersects(rightConnection))
+            {
+                polygon.getSegments().remove(right);
+                addSegmentToPolygon(polygon, indexFirst+1, connection);
+                addSegmentToPolygon(polygon, indexFirst+2, new Segment(line));
+                addSegmentToPolygon(polygon, indexFirst+3, rightConnection);
+                merged = true;
+            }
+        }
+
+        if (!merged)
+        {
+            final Segment left = polygon.getSegments().get(indexFirst - 1 < 0 ? size - 1 : indexFirst - 1);
+            if(reachableFromP2.contains(left))
+            {
+                final Segment leftConnection = new Segment(left.getX2(), left.getY2(), line.getP2().getX(), line.getP2().getY(), SegmentType.SOFT);
+                final Segment connection = new Segment(line.getP1().getX(), line.getP1().getY(), first.getX2(), first.getY2(), SegmentType.SOFT);
+                if(!connection.intersects(leftConnection))
+                {
+                    polygon.getSegments().remove(first);
+                    addSegmentToPolygon(polygon, indexFirst, leftConnection);
+                    addSegmentToPolygon(polygon, indexFirst + 1, new Segment(line.getP2(), line.getP1(), SegmentType.HARD));
+                    addSegmentToPolygon(polygon, indexFirst + 2, connection);
+                    merged = true;
+                }
+            }
+        }
+        return merged;
+    }
+
+    private void addSegmentToPolygon(final Polygon2D polygon, final int indexFirst, final Segment segment)
+    {
+        final int size = polygon.getSegments().size();
+        if (size > indexFirst)
+        {
+            polygon.getSegments().add(indexFirst , segment);
+        }
+        else
+        {
+            polygon.add(segment);
+        }
     }
 }

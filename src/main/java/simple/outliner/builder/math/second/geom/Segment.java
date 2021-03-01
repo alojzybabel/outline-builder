@@ -3,6 +3,7 @@ package simple.outliner.builder.math.second.geom;
 import java.awt.geom.Line2D;
 
 import com.kadme.test.Line;
+import com.kadme.test.Point;
 
 public class Segment
 {
@@ -16,6 +17,15 @@ public class Segment
                                       line.getP2().getX(),
                                       line.getP2().getY());
         this.type = SegmentType.HARD;
+    }
+
+    public Segment(final Point a, Point b, final SegmentType type)
+    {
+        this.line = new Line2D.Double(a.getX(),
+                                      a.getY(),
+                                      b.getX(),
+                                      b.getY());
+        this.type = type;
     }
 
     public Segment(final double x1, final double y1, final double x2, final double y2, final SegmentType type)
