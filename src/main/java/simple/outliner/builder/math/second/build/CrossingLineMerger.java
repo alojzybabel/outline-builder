@@ -11,11 +11,10 @@ public class CrossingLineMerger extends AbstractPointMerger implements LineMerge
     {
         if (isMyJob(polygon, line))
         {
-            return mergePoint(line.getP1(), polygon) && mergePoint(line.getP2(), polygon);
+            return mergeOutsidePoint(line.getP1(), polygon, line) && mergeOutsidePoint(line.getP2(), polygon, line);
         }
         return false;
     }
-
 
     /**
      * Check if the line should be merge by this merger.

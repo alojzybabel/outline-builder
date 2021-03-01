@@ -13,7 +13,7 @@ public class InOutLineMerger extends AbstractPointMerger implements LineMerger
         if (isMyJob(polygon, line))
         {
             final Point outlinePoint = polygon.contains(line.getP1()) ? line.getP2() : line.getP1();
-            return mergePoint(outlinePoint, polygon);
+            return mergeOutsidePoint(outlinePoint, polygon, line);
         }
        return false;
     }

@@ -26,13 +26,13 @@ public class OutlineLineMerger extends AbstractMergerParent implements LineMerge
             if (index1 < index2)
             {
                 final Segment lineSegment = new Segment(line);
-                mergeSegment(index1, index2, lineSegment, polygon);
+                mergeLine(index1, index2, lineSegment, polygon);
             }
             else if (index1 > index2)
             {
                 final Segment lineSegment = new Segment(line.getP2().getX(), line.getP2().getY(),
                                                         line.getP1().getX(), line.getP1().getY(), SegmentType.HARD);
-                mergeSegment(index2, index1, lineSegment, polygon);
+                mergeLine(index2, index1, lineSegment, polygon);
             }
             else
             {
@@ -57,7 +57,14 @@ public class OutlineLineMerger extends AbstractMergerParent implements LineMerge
                && !isTheLineIntersectingThePolygon(polygon, line);
     }
 
-    private void mergeSegment(final int start, final int end, final Segment segment, final Polygon2D polygon)
+    /**
+     * Merge line to the polygon.
+     * @param start
+     * @param end
+     * @param segment
+     * @param polygon
+     */
+    private void mergeLine(final int start, final int end, final Segment segment, final Polygon2D polygon)
     {
         final LinkedList<Segment> segments = polygon.getSegments();
         final Segment first = polygon.getSegments().get(start);

@@ -27,12 +27,6 @@ public class Segment
         this.type = type;
     }
 
-    public Segment(final Line2D line, final SegmentType type)
-    {
-        this.line = line;
-        this.type = type;
-    }
-
     public Line2D getLine()
     {
         return line;

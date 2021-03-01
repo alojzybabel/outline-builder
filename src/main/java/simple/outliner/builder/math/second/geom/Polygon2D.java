@@ -8,6 +8,7 @@ import com.kadme.test.Point;
 /** Represents the polygon. */
 public class Polygon2D
 {
+    /** Store all segments of polygon. */
     private final LinkedList<Segment> segments;
 
     public Polygon2D(final LinkedList<Segment> segments)

@@ -10,8 +10,8 @@ public class ComposedLineMerger implements LineMerger
 {
     final LineMerger [] mergers =
                     {
-                        //new OutlineLineMerger(),
-                        //new CrossingLineMerger(),
+                        new OutlineLineMerger(),
+                        new CrossingLineMerger(),
                         new InOutLineMerger(),
                         new InlineLineMerger()
                     };

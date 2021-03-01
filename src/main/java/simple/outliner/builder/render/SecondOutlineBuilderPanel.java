@@ -62,6 +62,9 @@ public class SecondOutlineBuilderPanel extends JPanel implements ActionListener
         builder.getUsedLines().forEach( l -> {
             drawLine(l, Color.BLACK, g2d);
         });
+
+        g2d.setStroke(thick);
+        drawLine(builder.getUsedLines().get(builder.getUsedLines().size() - 1), Color.CYAN, g2d);
     }
 
     private void drawAll(final Graphics2D g)
